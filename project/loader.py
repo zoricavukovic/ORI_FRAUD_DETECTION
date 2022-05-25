@@ -139,6 +139,8 @@ def preprocessing(data):
     X = new_Data.drop('Class', axis=1)
     y = new_Data['Class']
 
+    #X, y = SMOTE_data(data)
+
     # scaling
     standard_scaler = StandardScaler()
     x_scaler = standard_scaler.fit_transform(X)
@@ -146,7 +148,54 @@ def preprocessing(data):
     X_train, X_test, y_train, y_test = creating_training_and_test_set(x_scaler, y)
     print("\nNaive Bayes undersampling ----------------------------------")
     NaiveBayesModel(X_train, X_test, y_train, y_test)
+    print("\nDecision Tree undersampling ----------------------------------")
+    DecisionTreeModel(X_train, X_test, y_train, y_test)
+    print("\nRandom Forest undersampling ----------------------------------")
+    RandomForestModel(X_train, X_test, y_train, y_test)
+    print("\nSupport vector machine undersampling----------------------------------")
+    SupportVectorMachineModel(X_train, X_test, y_train, y_test)
+    ###################################################
 
+    new_Data = oversampling(data)
+
+    # splitting data
+    X = new_Data.drop('Class', axis=1)
+    y = new_Data['Class']
+
+    # scaling
+    standard_scaler = StandardScaler()
+    x_scaler = standard_scaler.fit_transform(X)
+
+    X_train, X_test, y_train, y_test = creating_training_and_test_set(x_scaler, y)
+    print("\nNaive Bayes oversampling ----------------------------------")
+    NaiveBayesModel(X_train, X_test, y_train, y_test)
+    print("\nDecision Tree oversampling ----------------------------------")
+    DecisionTreeModel(X_train, X_test, y_train, y_test)
+    print("\nRandom Forest oversampling ----------------------------------")
+    RandomForestModel(X_train, X_test, y_train, y_test)
+    print("\nSupport vector machine oversampling----------------------------------")
+    SupportVectorMachineModel(X_train, X_test, y_train, y_test)
+
+    ###################################################
+    X, y = SMOTE_data(data)
+
+    # scaling
+    standard_scaler = StandardScaler()
+    x_scaler = standard_scaler.fit_transform(X)
+
+    X_train, X_test, y_train, y_test = creating_training_and_test_set(x_scaler, y)
+    print("\nNaive Bayes SMOTE ----------------------------------")
+    NaiveBayesModel(X_train, X_test, y_train, y_test)
+    print("\nDecision Tree SMOTE ----------------------------------")
+    DecisionTreeModel(X_train, X_test, y_train, y_test)
+    print("\nRandom Forest SMOTE ----------------------------------")
+    RandomForestModel(X_train, X_test, y_train, y_test)
+    print("\nSupport vector machine SMOTE----------------------------------")
+    SupportVectorMachineModel(X_train, X_test, y_train, y_test)
+
+
+    # print("\nCNN ----------------------------------")
+    # #CNNModel(X_train, X_test, y_train, y_test)
 
 def draw_histograms(dataframe, features, rows, cols):
     fig = plt.figure(figsize=(20, 20))
@@ -167,6 +216,3 @@ if __name__ == '__main__':
     preprocessing(loaded_data)
 
     pass
-
-
-
