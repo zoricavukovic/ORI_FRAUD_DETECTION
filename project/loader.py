@@ -1,8 +1,8 @@
-
 import pandas as pd
 import numpy as np
 import random
 import tensorflow as tf
+from keras.optimizers import Adam
 from sklearn.preprocessing import StandardScaler
 from keras.layers import Conv1D, BatchNormalization, Dropout, Flatten, Dense
 from keras import Sequential
@@ -79,8 +79,10 @@ def CNNModel(X_train, X_test, y_train, y_test):
 
     cnn_model.add(Dense(1, activation='sigmoid'))
     cnn_model.summary()
+    cnn_model.compile(optimizer=Adam(lr=0.0001), loss='binary_crossentropy', metrics=[tf.keras.metrics.Recall(),
+                                                                                      tf.keras.metrics.Precision(),
+                                                                                      'accuracy'])
     print(cnn_model.fit(X_train, y_train, epochs=epochs, validation_data=(X_test, y_test), verbose=1))
-    # accuracy_score(y_test, y_test1)
 
 
 def SMOTE_data(data):
@@ -139,13 +141,11 @@ def preprocessing(data):
     X = new_Data.drop('Class', axis=1)
     y = new_Data['Class']
 
-    #X, y = SMOTE_data(data)
-
     # scaling
     standard_scaler = StandardScaler()
     x_scaler = standard_scaler.fit_transform(X)
-
     X_train, X_test, y_train, y_test = creating_training_and_test_set(x_scaler, y)
+
     print("\nNaive Bayes undersampling ----------------------------------")
     NaiveBayesModel(X_train, X_test, y_train, y_test)
     print("\nDecision Tree undersampling ----------------------------------")
@@ -155,6 +155,10 @@ def preprocessing(data):
     print("\nSupport vector machine undersampling----------------------------------")
     SupportVectorMachineModel(X_train, X_test, y_train, y_test)
     ###################################################
+    print("\nCNN undersampling ----------------------------------")
+    CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1), X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
+            y_train.to_numpy(), y_test.to_numpy())
+
 
     new_Data = oversampling(data)
 
@@ -167,6 +171,7 @@ def preprocessing(data):
     x_scaler = standard_scaler.fit_transform(X)
 
     X_train, X_test, y_train, y_test = creating_training_and_test_set(x_scaler, y)
+
     print("\nNaive Bayes oversampling ----------------------------------")
     NaiveBayesModel(X_train, X_test, y_train, y_test)
     print("\nDecision Tree oversampling ----------------------------------")
@@ -176,8 +181,17 @@ def preprocessing(data):
     print("\nSupport vector machine oversampling----------------------------------")
     SupportVectorMachineModel(X_train, X_test, y_train, y_test)
 
+    print("\nCNN overersampling ----------------------------------")
+    CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1),
+            X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
+            y_train.to_numpy(), y_test.to_numpy())
+
     ###################################################
     X, y = SMOTE_data(data)
+
+    # splitting data
+    X = new_Data.drop('Class', axis=1)
+    y = new_Data['Class']
 
     # scaling
     standard_scaler = StandardScaler()
@@ -193,9 +207,11 @@ def preprocessing(data):
     print("\nSupport vector machine SMOTE----------------------------------")
     SupportVectorMachineModel(X_train, X_test, y_train, y_test)
 
+    print("\nCNN SMOTE ----------------------------------")
+    CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1),
+             X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
+             y_train.to_numpy(), y_test.to_numpy())
 
-    # print("\nCNN ----------------------------------")
-    # #CNNModel(X_train, X_test, y_train, y_test)
 
 def draw_histograms(dataframe, features, rows, cols):
     fig = plt.figure(figsize=(20, 20))
