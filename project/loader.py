@@ -1,3 +1,5 @@
+import math
+
 import pandas as pd
 import numpy as np
 import random
@@ -24,7 +26,6 @@ def RandomForestModel(X_train, X_test, y_train, y_test):
     random_forest_model = RandomForestClassifier(n_estimators=10)
     random_forest_model.fit(X_train, y_train)
     y_pred = random_forest_model.predict(X_test)
-    bla = random_forest_model.score(X_test, y_test)
     print(random_forest_model.score(X_test, y_test))
     print(classification_report(y_test, y_pred))
     print("F1 score---- ", f1_score(y_test, y_pred))
@@ -48,7 +49,6 @@ def SupportVectorMachineModel(X_train, X_test, y_train, y_test):
     print(support_vector_machine_model.score(X_test, y_test))
     print(classification_report(y_test, y_pred))
     print("F1 score---- ", f1_score(y_test, y_pred))
-    # print(naive_bayes_model.score(X_test, y_test))
     print(accuracy_score(y_test, y_pred))
 
 
@@ -65,6 +65,7 @@ def NaiveBayesModel(X_train, X_test, y_train, y_test):
 def CNNModel(X_train, X_test, y_train, y_test):
     epochs = 20
     cnn_model = Sequential()
+
     cnn_model.add(Conv1D(filters=32, kernel_size=2, activation="relu", input_shape=X_train[0].shape))
     cnn_model.add(BatchNormalization())
     cnn_model.add(Dropout(0.2))
@@ -82,7 +83,19 @@ def CNNModel(X_train, X_test, y_train, y_test):
     cnn_model.compile(optimizer=Adam(lr=0.0001), loss='binary_crossentropy', metrics=[tf.keras.metrics.Recall(),
                                                                                       tf.keras.metrics.Precision(),
                                                                                       'accuracy'])
-    print(cnn_model.fit(X_train, y_train, epochs=epochs, validation_data=(X_test, y_test), verbose=1))
+    middle_index = math.ceil(len(X_test)/2)
+    X_val = X_test[:middle_index]
+    y_val = y_test[:middle_index]
+
+    X_testing = X_test[middle_index:]
+    y_testing = y_test[middle_index:]
+
+    cnn_model.fit(X_train, y_train, epochs=epochs, validation_data=(X_val, y_val), verbose=0)
+    score = cnn_model.evaluate(X_testing, y_testing)
+    print("Total loss: ", score[0])
+    print("Total recall: ", score[1])
+    print("Total precision: ", score[2])
+    print("Total accurancy: ", score[3])
 
 
 def SMOTE_data(data):
@@ -154,7 +167,7 @@ def preprocessing(data):
     RandomForestModel(X_train, X_test, y_train, y_test)
     print("\nSupport vector machine undersampling----------------------------------")
     SupportVectorMachineModel(X_train, X_test, y_train, y_test)
-    ###################################################
+    ##################################################
     print("\nCNN undersampling ----------------------------------")
     CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1), X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
             y_train.to_numpy(), y_test.to_numpy())
@@ -172,19 +185,19 @@ def preprocessing(data):
 
     X_train, X_test, y_train, y_test = creating_training_and_test_set(x_scaler, y)
 
-    print("\nNaive Bayes oversampling ----------------------------------")
-    NaiveBayesModel(X_train, X_test, y_train, y_test)
-    print("\nDecision Tree oversampling ----------------------------------")
-    DecisionTreeModel(X_train, X_test, y_train, y_test)
-    print("\nRandom Forest oversampling ----------------------------------")
-    RandomForestModel(X_train, X_test, y_train, y_test)
-    print("\nSupport vector machine oversampling----------------------------------")
-    SupportVectorMachineModel(X_train, X_test, y_train, y_test)
+    # print("\nNaive Bayes oversampling ----------------------------------")
+    # NaiveBayesModel(X_train, X_test, y_train, y_test)
+    # print("\nDecision Tree oversampling ----------------------------------")
+    # DecisionTreeModel(X_train, X_test, y_train, y_test)
+    # print("\nRandom Forest oversampling ----------------------------------")
+    # RandomForestModel(X_train, X_test, y_train, y_test)
+    # print("\nSupport vector machine oversampling----------------------------------")
+    # SupportVectorMachineModel(X_train, X_test, y_train, y_test)
 
-    print("\nCNN overersampling ----------------------------------")
-    CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1),
-            X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
-            y_train.to_numpy(), y_test.to_numpy())
+    # print("\nCNN overersampling ----------------------------------")
+    # CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1),
+    #         X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
+    #         y_train.to_numpy(), y_test.to_numpy())
 
     ###################################################
     X, y = SMOTE_data(data)
@@ -198,19 +211,19 @@ def preprocessing(data):
     x_scaler = standard_scaler.fit_transform(X)
 
     X_train, X_test, y_train, y_test = creating_training_and_test_set(x_scaler, y)
-    print("\nNaive Bayes SMOTE ----------------------------------")
-    NaiveBayesModel(X_train, X_test, y_train, y_test)
-    print("\nDecision Tree SMOTE ----------------------------------")
-    DecisionTreeModel(X_train, X_test, y_train, y_test)
-    print("\nRandom Forest SMOTE ----------------------------------")
-    RandomForestModel(X_train, X_test, y_train, y_test)
-    print("\nSupport vector machine SMOTE----------------------------------")
-    SupportVectorMachineModel(X_train, X_test, y_train, y_test)
+    # print("\nNaive Bayes SMOTE ----------------------------------")
+    # NaiveBayesModel(X_train, X_test, y_train, y_test)
+    # print("\nDecision Tree SMOTE ----------------------------------")
+    # DecisionTreeModel(X_train, X_test, y_train, y_test)
+    # print("\nRandom Forest SMOTE ----------------------------------")
+    # RandomForestModel(X_train, X_test, y_train, y_test)
+    # print("\nSupport vector machine SMOTE----------------------------------")
+    # SupportVectorMachineModel(X_train, X_test, y_train, y_test)
 
-    print("\nCNN SMOTE ----------------------------------")
-    CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1),
-             X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
-             y_train.to_numpy(), y_test.to_numpy())
+    # print("\nCNN SMOTE ----------------------------------")
+    # CNNModel(X_train.reshape(X_train.shape[0], X_train.shape[1], 1),
+    #          X_test.reshape(X_test.shape[0], X_test.shape[1], 1),
+    #          y_train.to_numpy(), y_test.to_numpy())
 
 
 def draw_histograms(dataframe, features, rows, cols):
